@@ -4,6 +4,10 @@ const path = require('path');
 const hbs = require('express-handlebars');
 const passport = require('passport');
 const session = require('express-session');
+const ensureAuthenticated = (req, res, next) => {
+  if (req.isAuthenticated()) { return next(); }
+  res.redirect('/auth/no-permission');
+}
 
 const app = express();
 
@@ -20,7 +24,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, '/public')));
 
 app.use('/auth', require('./routes/auth.routes'));
-app.use('/user', require('./routes/user.routes'));
+app.use('/user', ensureAuthenticated, require('./routes/user.routes'));
 
 
 app.get('/', (req, res) => {
